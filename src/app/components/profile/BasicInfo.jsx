@@ -1,0 +1,51 @@
+"use client"
+import { Form } from "../Form";
+import { Input } from "../Input"
+import { input } from "@/app/utils/input";
+import { Select } from "../Select";
+import { select } from "@/app/utils/select";
+import { schema } from "@/app/utils/schema";
+import { useUpdate } from "@/app/hooks/useUpdate";
+import { userService } from "@/app/services/user";
+
+export const BasicInfo = ({ user }) => {
+    const { register, handleSubmit, isSubmitting, validateErrors, response, error } = useUpdate({
+        id: user.id,
+        schema: schema.user(true),
+        defaultValues: {...user},
+        onSubmit: userService.update
+    });
+
+    return (
+        <Form 
+            handleSubmit={handleSubmit} 
+            btnTitle="Guardar cambios" 
+            isLoading={isSubmitting}
+            showCancelBtn={false}>
+            {
+                input.user.map(item => {
+                    if (item.id === "password") return null;
+                    return (
+                        <Input
+                            key={item.id}
+                            {...item}
+                            register={register}
+                            error={validateErrors[item.id]?.message}
+                        />
+                    );
+                })
+            }
+            {
+                select.usersRole.map(item => (
+                    <Select
+                        key={item.id}
+                        {...item}
+                        register={register}
+                        error={validateErrors[item.id]?.message}
+                        disabled
+                    />
+                ))
+            }
+        </Form>               
+    );
+};
